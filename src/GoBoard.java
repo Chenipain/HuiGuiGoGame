@@ -4,6 +4,8 @@ import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.transform.Translate;
 
+//BITE
+
 class GoBoard extends Pane {
     // default constructor for the class
     public GoBoard() {
