@@ -9,11 +9,11 @@ import javafx.scene.transform.Translate;
 class GoBoard extends Pane {
     // default constructor for the class
     public GoBoard() {
-        render = new GoPiece[8][8];
-        horizontal = new Line[8];
-        vertical = new Line[8];
-        horizontal_t = new Translate[8];
-        vertical_t = new Translate[8];
+        render = new GoPiece[7][7];
+        horizontal = new Line[7];
+        vertical = new Line[7];
+        horizontal_t = new Translate[7];
+        vertical_t = new Translate[7];
         surrounding = new int[3][3];
         can_reverse = new boolean[3][3];
         initialiseLinesBackground();
@@ -60,8 +60,8 @@ class GoBoard extends Pane {
     @Override
     public void resize(double width, double height) {
         super.resize(width, height);
-        cell_height = height / 8.0;
-        cell_width = width / 8.0;
+        cell_height = height / 7.0;
+        cell_width = width / 7.0;
         background.setHeight(height);
         background.setWidth(width);
         horizontalResizeRelocate(width);
@@ -72,10 +72,10 @@ class GoBoard extends Pane {
     // public method for resetting the game
     public void resetGame() {
         resetRenders();
+        render[2][2].setPiece(1);
         render[3][3].setPiece(1);
-        render[4][4].setPiece(1);
-        render[3][4].setPiece(2);
-        render[4][3].setPiece(2);
+        render[2][3].setPiece(2);
+        render[3][2].setPiece(2);
         in_play = true;
         current_player = 2;
         opposing = 1;
@@ -85,9 +85,9 @@ class GoBoard extends Pane {
 
     // private method that will reset the renders
     private void resetRenders() {
-        for (int i = 0; i < 8; i++)
+        for (int i = 0; i < 7; i++)
         {
-            for (int j = 0; j < 8; j++)
+            for (int j = 0; j < 7; j++)
             {
                 render[i][j].setPiece(0);
             }
@@ -97,9 +97,9 @@ class GoBoard extends Pane {
     // private method that will initialise the background and the lines
     private void initialiseLinesBackground() {
         background = new Rectangle();
-        background.setFill(Color.CYAN);
+        background.setFill(Color.GOLDENROD);
         this.getChildren().add(background);
-        for (int i = 0; i < 8; i++)
+        for (int i = 0; i < 7; i++)
         {
             horizontal_t[i] = new Translate(0,0);
             horizontal[i] = new Line();
@@ -111,7 +111,7 @@ class GoBoard extends Pane {
             this.getChildren().add(horizontal[i]);
         }
 
-        for (int i = 0; i < 8; i++)
+        for (int i = 0; i < 7; i++)
         {
             vertical_t[i] = new Translate();
             vertical[i] = new Line();
@@ -127,20 +127,20 @@ class GoBoard extends Pane {
 
     // private method for resizing and relocating the horizontal lines
     private void horizontalResizeRelocate(final double width) {
-        for (int i = 0; i < 8; i++)
+        for (int i = 0; i < 7; i++)
         {
             horizontal[i].setEndX(width);
-            horizontal_t[i].setY(i * cell_height);
+            horizontal_t[i].setY(cell_height / 2 + i * cell_height);
         }
 
     }
 
     // private method for resizing and relocating the vertical lines
     private void verticalResizeRelocate(final double height) {
-        for (int i = 0; i < 8; i++)
+        for (int i = 0; i < 7; i++)
         {
             vertical[i].setEndY(height);
-            vertical_t[i].setX(i * cell_width);
+            vertical_t[i].setX(cell_width / 2 + i * cell_width);
         }
     }
 
@@ -156,9 +156,9 @@ class GoBoard extends Pane {
     private void updateScores() {
         player2_score = 0;
         player1_score = 0;
-        for (int i = 0; i < 8; i++)
+        for (int i = 0; i < 7; i++)
         {
-            for (int j = 0; j < 8; j++)
+            for (int j = 0; j < 7; j++)
             {
                 if (getPiece(i, j) == 1)
                     player1_score++;
@@ -170,9 +170,9 @@ class GoBoard extends Pane {
 
     // private method for resizing and relocating all the pieces
     private void pieceResizeRelocate() {
-        for (int i = 0; i < 8; i++)
+        for (int i = 0; i < 7; i++)
         {
-            for (int j = 0; j < 8; j++)
+            for (int j = 0; j < 7; j++)
             {
                 render[i][j].resize(cell_width, cell_height);
                 render[i][j].relocate(i * cell_width, j  * cell_height);
@@ -291,7 +291,7 @@ class GoBoard extends Pane {
     // for determing reverse chains much easier
     private int getPiece(final int x, final int y) {
         // NOTE: this is to keep the compiler happy until you get to this point
-        if (x < 0 || x > 7 || y < 0 || y > 7)
+        if (x < 0 || x > 6 || y < 0 || y > 6)
             return -1;
         return render[x][y].getPiece();
     }
@@ -310,9 +310,9 @@ class GoBoard extends Pane {
 
     // private method to determine if a player has a move available
     private boolean canMove() {
-        for (int i = 0; i < 8; i++)
+        for (int i = 0; i < 7; i++)
         {
-            for (int j = 0; j < 8; j++)
+            for (int j = 0; j < 7; j++)
             {
                 if (getPiece(i, j) == 0)
                 {
@@ -342,9 +342,9 @@ class GoBoard extends Pane {
 
     // private method that will initialise everything in the render array
     private void initialiseRender() {
-        for (int i = 0; i < 8; i++)
+        for (int i = 0; i < 7; i++)
         {
-            for (int j = 0; j < 8; j++)
+            for (int j = 0; j < 7; j++)
             {
                 render[i][j] = new GoPiece(0);
                 getChildren().add(render[i][j]);
