@@ -33,16 +33,7 @@ class GoBoard extends Pane {
         int indexy = (int) (y / cell_height);
         if (getPiece(indexx, indexy) != 0)
             return;
-        determineSurrounding(indexx, indexy);
-        if (!adjacentOpposingPiece())
-        {
-            return;
-        }
-        if (!determineReverse(indexx, indexy))
-        {
-            return;
-        }
-        placeAndReverse(indexx, indexy);
+        render[indexx][indexy].setPiece(current_player);
         updateScores();
         if (current_player == 1) {
 
@@ -73,11 +64,6 @@ class GoBoard extends Pane {
     // public method for resetting the game
     public void resetGame() {
         resetRenders();
-        render[6][6].setPiece(1);
-        render[0][0].setPiece(1);
-        render[3][3].setPiece(1);
-        render[1][0].setPiece(1);
-        render[0][1].setPiece(1);
         in_play = true;
         current_player = 2;
         opposing = 1;
@@ -135,112 +121,6 @@ class GoBoard extends Pane {
         }
     }
 
-    // private method for determining which pieces surround x,y will update the
-    // surrounding array to reflect this
-    private void determineSurrounding(final int x, final int y) {
-        for (int i = -1; i < 2; i++)
-        {
-            for (int j = -1; j < 2; j++)
-            {
-                if (j == 0 && i == 0)
-                {
-                    surrounding[i + 1][j + 1] = 0;
-                }
-                else
-                {
-                    surrounding[i + 1][j + 1] = getPiece(x + i, j + y);
-                }
-            }
-        }
-    }
-
-    // private method for determining if a reverse can be made will update the can_reverse
-    // array to reflect the answers will return true if a single reverse is found
-    private boolean determineReverse(final int x, final int y) {
-        // NOTE: this is to keep the compiler happy until you get to this part
-        boolean isOne = false;
-        for (int i = -1; i < 2; i++)
-        {
-            for (int j = -1; j < 2; j++)
-            {
-                if (i != 0 || j != 0)
-                {
-                    can_reverse[i + 1][j + 1] = isReverseChain(x, y, i, j, current_player);
-                    if (can_reverse[i + 1][j + 1])
-                    {
-                        isOne = true;
-                    }
-                }
-            }
-        }
-        can_reverse[1][1] = false;
-        return isOne;
-    }
-
-    // private method for determining if a reverse can be made from a position (x,y) for
-    // a player piece in the given direction (dx,dy) returns true if possible
-    // assumes that the first piece has already been checked
-    private boolean isReverseChain(final int x, final int y, final int dx, final int dy, final int player) {
-        // NOTE: this is to keep the compiler happy until you get to this part
-        int idx = x + dx;
-        int idy = y + dy;
-        boolean passed = false;
-        while (getPiece(idx, idy) == opposing)
-        {
-            idx += dx;
-            idy += dy;
-            passed = true;
-        }
-        if (getPiece(idx, idy) == player)
-            return (passed);
-        return false;
-    }
-
-    // private method for determining if any of the surrounding pieces are an opposing
-    // piece. if a single one exists then return true otherwise false
-    private boolean adjacentOpposingPiece() {
-        // NOTE: this is to keep the compiler happy until you get to this part
-        for (int i = 0; i < 3; i++)
-        {
-            for (int j = 0; j < 3; j++)
-            {
-                if (surrounding[i][j] == opposing)
-                {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    // private method for placing a piece and reversing pieces
-    private void placeAndReverse(final int x, final int y) {
-
-        render[x][y].setPiece(current_player);
-        for (int i = -1; i < 2; i++)
-        {
-            for (int j = -1; j < 2; j++)
-            {
-                if (can_reverse[i + 1][j + 1])
-                {
-                    reverseChain(x, y, i, j);
-                }
-            }
-        }
-    }
-
-    // private method to reverse a chain
-    private void reverseChain(final int x, final int y, final int dx, final int dy) {
-        int idx = x + dx;
-        int idy = y + dy;
-        while (getPiece(idx, idy) == opposing)
-        {
-            render[idx][idy].swapPiece();
-            idx += dx;
-            idy += dy;
-        }
-    }
-
     // private method for getting a piece on the board. this will return the board
     // value unless we access an index that doesnt exist. this is to make the code
     // for determing reverse chains much easier
@@ -253,34 +133,15 @@ class GoBoard extends Pane {
 
     // private method that will determine if the end of the game has been reached
     private void determineEndGame() {
-        if (!canMove())
+        if (false)
         {
             swapPlayers();
-            if (!canMove()) {
+            if (false) {
                 in_play = false;
                 determineWinner();
             }
         }
     }
-
-    // private method to determine if a player has a move available
-    private boolean canMove() {
-        for (int i = 0; i < 7; i++)
-        {
-            for (int j = 0; j < 7; j++)
-            {
-                if (getPiece(i, j) == 0)
-                {
-                    determineSurrounding(i, j);
-                    if (adjacentOpposingPiece() && determineReverse(i, j))
-                        return true;
-                }
-            }
-        }
-        // NOTE: this is to keep the compiler happy until you get to this part
-        return false;
-    }
-
     // private method that determines who won the game
     private void determineWinner() {
         if (player1_score < player2_score)
