@@ -11,6 +11,8 @@ import javafx.scene.text.Text;
 import javafx.scene.text.Font;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+
+import java.lang.reflect.Array;
 import java.util.Vector;
 
 class GoBoard extends Pane {
@@ -23,6 +25,7 @@ class GoBoard extends Pane {
         render = new GoPiece[7][7];
         initialiseRender();
         resetGame();
+        previous_states = new Vector<GoBoardStorage>();
     }
 
     // public method that will try to place a piece in the given x,y coordinate
@@ -35,6 +38,8 @@ class GoBoard extends Pane {
         if (getPiece(indexx, indexy) != 0)
             return;
         render[indexx][indexy].setPiece(current_player);
+        if (!validateMove(indexx, indexy))
+            return;
         checkChains(indexx, indexy);
         updateScores();
         if (current_player == 1) {
@@ -53,35 +58,79 @@ class GoBoard extends Pane {
     }
 
 
+    public boolean validateMove(int indexx, int indexy)
+    {
+        if (!checkSuicide(indexx, indexy))
+        {
+            render[indexx][indexy].resetPiece();
+            return false;
+        }
+        if (!checkKo())
+        {
+            render[indexx][indexy].resetPiece();
+            return false;
+        }
+        previous_states.add(new GoBoardStorage(render));
+        return true;
+    }
+
+    public boolean checkKo()
+    {
+        for (int i = 0; i < previous_states.size(); i++)
+        {
+            if (previous_states.elementAt(i).isSame(render))
+            {
+                for (int j = 0; j < 7; j++)
+                {
+                    for (int k = 0; k < 7; k++)
+                    {
+                        render[j][k].setPiece(previous_states.lastElement().board[j][k]);
+                    }
+                }
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private boolean checkSuicide(int indexx, int indexy)
+    {
+        checkChains(indexx, indexy);
+        Vector<GoPiece> chain = new Vector<>();
+        chainMaking(indexx, indexy, chain, current_player);
+        return chainCheck(chain,false);
+    }
+
     public void checkChains(int indexx, int indexy)
     {
         if (getPiece(indexx + 1, indexy) == opposing)
         {
             Vector<GoPiece> chain = new Vector<GoPiece>();
-            chainMaking(indexx + 1, indexy, chain);
-            chainCheck(chain);
+            chainMaking(indexx + 1, indexy, chain, opposing);
+            chainCheck(chain,true);
         }
         if (getPiece(indexx - 1, indexy) == opposing)
         {
             Vector<GoPiece> chain = new Vector<GoPiece>();
-            chainMaking(indexx - 1, indexy, chain);
-            chainCheck(chain);
+            chainMaking(indexx - 1, indexy, chain, opposing);
+            chainCheck(chain,true);
         }
         if (getPiece(indexx, indexy - 1) == opposing)
         {
             Vector<GoPiece> chain = new Vector<GoPiece>();
-            chainMaking(indexx, indexy - 1, chain);
-            chainCheck(chain);
+            chainMaking(indexx, indexy - 1, chain, opposing);
+            chainCheck(chain, true);
         }
         if (getPiece(indexx, indexy + 1) == opposing)
         {
             Vector<GoPiece> chain = new Vector<GoPiece>();
-            chainMaking(indexx, indexy + 1, chain);
-            chainCheck(chain);
+            chainMaking(indexx, indexy + 1, chain, opposing);
+            chainCheck(chain, true);
         }
     }
 
-    private void chainCheck(Vector<GoPiece> chain)
+    private boolean chainCheck(Vector<GoPiece> chain, boolean destroy)
     {
         boolean safe = false;
         for (int i = 0; i < chain.size(); i++)
@@ -93,32 +142,36 @@ class GoBoard extends Pane {
         }
         if (!safe)
         {
-            for (int i = 0; i < chain.size(); i++)
+            if (destroy)
             {
-                chain.elementAt(i).resetPiece();
+                for (int i = 0; i < chain.size(); i++) {
+                    chain.elementAt(i).resetPiece();
+                }
+                chain.removeAllElements();
             }
-            chain.removeAllElements();
+            return false;
         }
+        return true;
     }
 
-    private void chainMaking(int indexx, int indexy, Vector<GoPiece> chain)
+    private void chainMaking(int indexx, int indexy, Vector<GoPiece> chain, int player)
     {
         chain.add(render[indexx][indexy]);
-        if (getPiece(indexx + 1, indexy) == opposing && existingInChain(chain, indexx + 1, indexy) == 0)
+        if (getPiece(indexx + 1, indexy) == player && existingInChain(chain, indexx + 1, indexy) == 0)
         {
-            chainMaking(indexx + 1, indexy, chain);
+            chainMaking(indexx + 1, indexy, chain, player);
         }
-        if (getPiece(indexx - 1, indexy) == opposing && existingInChain(chain, indexx - 1, indexy) == 0)
+        if (getPiece(indexx - 1, indexy) == player && existingInChain(chain, indexx - 1, indexy) == 0)
         {
-            chainMaking(indexx - 1, indexy, chain);
+            chainMaking(indexx - 1, indexy, chain, player);
         }
-        if (getPiece(indexx, indexy - 1) == opposing && existingInChain(chain, indexx, indexy - 1) == 0)
+        if (getPiece(indexx, indexy - 1) == player && existingInChain(chain, indexx, indexy - 1) == 0)
         {
-            chainMaking(indexx, indexy - 1, chain);
+            chainMaking(indexx, indexy - 1, chain, player);
         }
-        if (getPiece(indexx, indexy + 1) == opposing && existingInChain(chain, indexx, indexy + 1) == 0)
+        if (getPiece(indexx, indexy + 1) == player && existingInChain(chain, indexx, indexy + 1) == 0)
         {
-            chainMaking(indexx, indexy + 1, chain);
+            chainMaking(indexx, indexy + 1, chain, player);
         }
     }
 
@@ -300,4 +353,5 @@ class GoBoard extends Pane {
     private boolean[][] can_reverse;
     private Text winnerLabel;
     private ImageView boardView;
+    private Vector<GoBoardStorage> previous_states;
 }
