@@ -35,8 +35,9 @@ class GoBoard extends Pane {
             return;
         int indexx = (int) (x / cell_width);
         int indexy = (int) (y / cell_height);
-        if (getPiece(indexx, indexy) != 0)
+        if (getPiece(indexx, indexy) != 0) {
             return;
+        }
         render[indexx][indexy].setPiece(current_player);
         if (!validateMove(indexx, indexy))
             return;
@@ -149,11 +150,11 @@ class GoBoard extends Pane {
                 }
                 if (current_player == 1)
                 {
-                    player1_score += chain.size();
+                    capturedWhite += chain.size();
                 }
                 else
                 {
-                    player2_score += chain.size();
+                    capturedBlack += chain.size();
                 }
                 chain.removeAllElements();
             }
@@ -230,6 +231,8 @@ class GoBoard extends Pane {
     // public method for resetting the game
     public void resetGame() {
         resetRenders();
+        capturedWhite = 0;
+        capturedBlack = 0;
         in_play = true;
         current_player = 2;
         opposing = 1;
@@ -257,13 +260,76 @@ class GoBoard extends Pane {
 
     // private method for updating the player scores
     private void updateScores() {
-        hasBlack = false;
-        hasWhite = false;
-        
+        player1_score = capturedWhite;
+        player2_score = capturedBlack;
+        countTer();
+        resetCounting();
         Text display = new Text("\tPlayer 1 : " + player1_score + "\t|\tCurrently Playing : Player " + current_player + "\t|\tPlayer 2 : " + player2_score);
         display.setFont(new Font(20));
         display.setY(50);
         this.getChildren().add(display);
+    }
+
+    private void countTer()
+    {
+        for (int i = 0; i < 7; i++)
+        {
+            for (int j = 0; j < 7; j++)
+            {
+                if (getPiece(i, j) == 0) {
+                    hasBlack = false;
+                    hasWhite = false;
+                    Vector<GoPiece> chain = new Vector<>();
+                    chainMaking(i, j, chain, 0);
+                    for (int k = 0; k < chain.size(); k++) {
+                        checkSurrounding(chain.elementAt(k).indexx, chain.elementAt(k).indexy);
+                        chain.elementAt(k).setPiece(3);
+                    }
+                    if (hasBlack && !hasWhite)
+                    {
+                        player2_score += chain.size();
+                    }
+                    else if (hasWhite && !hasBlack)
+                    {
+                        player1_score += chain.size();
+                    }
+                }
+            }
+        }
+    }
+
+    private void resetCounting()
+    {
+        for (int i = 0; i < 7; i++)
+        {
+            for (int j = 0; j < 7; j++)
+            {
+                if (getPiece(i, j) == 3)
+                {
+                    render[i][j].setPiece(0);
+                }
+            }
+        }
+    }
+
+    private void checkSurrounding(int x, int y)
+    {
+        checkThePiece(x + 1, y);
+        checkThePiece(x - 1, y);
+        checkThePiece(x, y + 1);
+        checkThePiece(x, y + 1);
+    }
+
+    private void checkThePiece(int x, int y)
+    {
+        if (getPiece(x, y) == 1)
+        {
+            hasWhite = true;
+        }
+        else if (getPiece(x , y) == 2)
+        {
+            hasBlack = true;
+        }
     }
 
     // private method for resizing and relocating all the pieces
@@ -355,4 +421,6 @@ class GoBoard extends Pane {
     private Vector<GoBoardStorage> previous_states;
     private boolean hasBlack;
     private boolean hasWhite;
+    private int capturedBlack;
+    private int capturedWhite;
 }
