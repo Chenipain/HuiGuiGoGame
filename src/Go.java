@@ -7,6 +7,7 @@ import javafx.scene.control.SkinBase;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
@@ -15,14 +16,24 @@ import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.transform.Translate;
 import javafx.stage.Stage;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 
-//class defnition for reversi game
+
+//class defnition for go game
 public class Go extends Application {
     // overridden init method
     public void init() {
         sp_mainlayout = new StackPane();
-        rc_reversi = new GoControl();
-        sp_mainlayout.getChildren().add(rc_reversi);
+        rc_go = new GoControl();
+        Image board = new Image("/resources/board.png");
+        ImageView boardView = new ImageView();
+        boardView.setImage(board);
+        boardView.setFitHeight(800);
+        boardView.setFitWidth(800);
+        boardView.setPreserveRatio(true);
+        sp_mainlayout.getChildren().add(boardView);
+        sp_mainlayout.getChildren().add(rc_go);
     }
 
     // overridden start method
@@ -44,7 +55,7 @@ public class Go extends Application {
 
     // private fields for a stack pane and a reversi control
     private StackPane sp_mainlayout;
-    private GoControl rc_reversi;
+    private GoControl rc_go;
 
 }
 

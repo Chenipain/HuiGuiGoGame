@@ -4,19 +4,13 @@ import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.transform.Translate;
 
-//BITE
+import javafx.scene.text.Text;
+import javafx.scene.text.Font;
 
 class GoBoard extends Pane {
     // default constructor for the class
     public GoBoard() {
         render = new GoPiece[7][7];
-        horizontal = new Line[7];
-        vertical = new Line[7];
-        horizontal_t = new Translate[7];
-        vertical_t = new Translate[7];
-        surrounding = new int[3][3];
-        can_reverse = new boolean[3][3];
-        initialiseLinesBackground();
         initialiseRender();
         resetGame();
     }
@@ -62,25 +56,22 @@ class GoBoard extends Pane {
         super.resize(width, height);
         cell_height = height / 7.0;
         cell_width = width / 7.0;
-        background.setHeight(height);
-        background.setWidth(width);
-        horizontalResizeRelocate(width);
-        verticalResizeRelocate(height);
         pieceResizeRelocate();
     }
 
     // public method for resetting the game
     public void resetGame() {
         resetRenders();
-        render[2][2].setPiece(1);
+        render[6][6].setPiece(1);
+        render[0][0].setPiece(1);
         render[3][3].setPiece(1);
-        render[2][3].setPiece(2);
-        render[3][2].setPiece(2);
+        render[1][0].setPiece(1);
+        render[0][1].setPiece(1);
         in_play = true;
-        current_player = 2;
-        opposing = 1;
-        player1_score = 2;
-        player2_score = 2;
+        current_player = 1;
+        opposing = 2;
+        swapPlayers();
+        updateScores();
     }
 
     // private method that will reset the renders
@@ -94,62 +85,17 @@ class GoBoard extends Pane {
         }
     }
 
-    // private method that will initialise the background and the lines
-    private void initialiseLinesBackground() {
-        background = new Rectangle();
-        background.setFill(Color.GOLDENROD);
-        this.getChildren().add(background);
-        for (int i = 0; i < 7; i++)
-        {
-            horizontal_t[i] = new Translate(0,0);
-            horizontal[i] = new Line();
-            horizontal[i].getTransforms().add(horizontal_t[i]);
-            horizontal[i].setStroke(Color.BLACK);
-            horizontal[i].setStartX(0);
-            horizontal[i].setStartY(0);
-            horizontal[i].setEndY(0);
-            this.getChildren().add(horizontal[i]);
-        }
-
-        for (int i = 0; i < 7; i++)
-        {
-            vertical_t[i] = new Translate();
-            vertical[i] = new Line();
-            vertical[i].getTransforms().add(vertical_t[i]);
-            vertical[i].setStroke(Color.BLACK);
-            vertical[i].setStartX(0);
-            vertical[i].setStartY(0);
-            vertical[i].setEndX(0);
-            this.getChildren().add(vertical[i]);
-        }
-
-    }
-
-    // private method for resizing and relocating the horizontal lines
-    private void horizontalResizeRelocate(final double width) {
-        for (int i = 0; i < 7; i++)
-        {
-            horizontal[i].setEndX(width);
-            horizontal_t[i].setY(cell_height / 2 + i * cell_height);
-        }
-
-    }
-
-    // private method for resizing and relocating the vertical lines
-    private void verticalResizeRelocate(final double height) {
-        for (int i = 0; i < 7; i++)
-        {
-            vertical[i].setEndY(height);
-            vertical_t[i].setX(cell_width / 2 + i * cell_width);
-        }
-    }
-
     // private method for swapping the players
     private void swapPlayers() {
         int save;
         save = current_player;
         current_player = opposing;
         opposing = save;
+        Text turn = new Text("Currently Playing : Player " + current_player);
+        turn.setFont(new Font(20));
+        turn.setY(35);
+        turn.setX(520);
+        this.getChildren().add(turn);
     }
 
     // private method for updating the player scores
@@ -166,6 +112,14 @@ class GoBoard extends Pane {
                     player2_score++;
             }
         }
+        Text score1 = new Text("Player 1 : " + player1_score);
+        score1.setFont(new Font(20));
+        score1.setY(35);
+        this.getChildren().add(score1);
+        Text score2 = new Text("Player 2 : " + player2_score);
+        score2.setFont(new Font(20));
+        score2.setY(745);
+        this.getChildren().add(score2);
     }
 
     // private method for resizing and relocating all the pieces
@@ -328,16 +282,25 @@ class GoBoard extends Pane {
 
     // private method that determines who won the game
     private void determineWinner() {
-        if (player2_score > player1_score)
+        if (player1_score < player2_score)
         {
+            winnerLabel = new Text("Player 2 wins !");
             System.out.println("Player 2 wins !");
         }
         else if (player1_score > player2_score)
         {
+            winnerLabel = new Text("Player 1 wins !");
             System.out.println("Player 1 wins !");
         }
         else
+        {
+            winnerLabel = new Text("WOW THAT IS A DRAW !");
             System.out.println("WOW THAT IS A DRAW !");
+        }
+        winnerLabel.setFont(new Font(100));
+        winnerLabel.setVisible(true);
+        winnerLabel.setY(200);
+        this.getChildren().add(winnerLabel);
     }
 
     // private method that will initialise everything in the render array
@@ -352,19 +315,6 @@ class GoBoard extends Pane {
         }
     }
 
-
-    // private fields that make the reversi board work
-
-    // rectangle that makes the background of the board
-    private Rectangle background;
-    // arrays for the lines that makeup the horizontal and vertical grid lines
-    private Line[] horizontal;
-    private Line[] vertical;
-    // arrays holding translate objects for the horizontal and vertical grid lines
-    private Translate[] horizontal_t;
-    private Translate[] vertical_t;
-    // arrays for the internal representation of the board and the pieces that are
-    // in place
     private GoPiece[][] render;
     // the current player who is playing and who is his opposition
     private int current_player;
@@ -381,4 +331,5 @@ class GoBoard extends Pane {
     private int[][] surrounding;
     // 3x3 array that determines if a reverse can be made in any direction
     private boolean[][] can_reverse;
+    private Text winnerLabel;
 }

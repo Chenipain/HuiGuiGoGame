@@ -29,6 +29,8 @@ class GoControl extends Control {
     // overridden version of the resize method
     @Override
     public void resize(double width, double height) {
+        width = width - 50;
+        height = height - 50;
         super.resize(width, height);
         rb_board.resize(width, height);
     }
