@@ -3,9 +3,11 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Ellipse;
 import javafx.scene.transform.Translate;
 
+import java.util.Vector;
+
 class GoPiece extends Group {
     // default constructor for the class
-    public GoPiece(int player) {
+    public GoPiece(int player, int x, int y) {
         this.player = player;
         piece = new Ellipse();
         t = new Translate();
@@ -21,6 +23,8 @@ class GoPiece extends Group {
         }
         piece.getTransforms().add(t);
         this.getChildren().add(piece);
+        indexx = x;
+        indexy = y;
     }
 
     // overridden version of the resize method to give the piece the correct size
@@ -68,6 +72,11 @@ class GoPiece extends Group {
         player = type;
     }
 
+    public void resetPiece()
+    {
+        setPiece(0);
+    }
+
     // returns the type of this piece
     public int getPiece() {
         // NOTE: this is to keep the compiler happy until you get to this point
@@ -78,4 +87,6 @@ class GoPiece extends Group {
     private int player;		// the player that this piece belongs to
     private Ellipse piece;	// ellipse representing the player's piece
     private Translate t;	// translation for the player piece
+    public int indexx;
+    public int indexy;
 }

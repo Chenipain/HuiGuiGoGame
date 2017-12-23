@@ -11,6 +11,7 @@ import javafx.scene.text.Text;
 import javafx.scene.text.Font;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import java.util.Vector;
 
 class GoBoard extends Pane {
     // default constructor for the class
@@ -34,6 +35,7 @@ class GoBoard extends Pane {
         if (getPiece(indexx, indexy) != 0)
             return;
         render[indexx][indexy].setPiece(current_player);
+        checkChains(indexx, indexy);
         updateScores();
         if (current_player == 1) {
 
@@ -48,6 +50,109 @@ class GoBoard extends Pane {
         }
         swapPlayers();
         determineEndGame();
+    }
+
+
+    public void checkChains(int indexx, int indexy)
+    {
+        if (getPiece(indexx + 1, indexy) == opposing)
+        {
+            Vector<GoPiece> chain = new Vector<GoPiece>();
+            chainMaking(indexx + 1, indexy, chain);
+            chainCheck(chain);
+        }
+        if (getPiece(indexx - 1, indexy) == opposing)
+        {
+            Vector<GoPiece> chain = new Vector<GoPiece>();
+            chainMaking(indexx - 1, indexy, chain);
+            chainCheck(chain);
+        }
+        if (getPiece(indexx, indexy - 1) == opposing)
+        {
+            Vector<GoPiece> chain = new Vector<GoPiece>();
+            chainMaking(indexx, indexy - 1, chain);
+            chainCheck(chain);
+        }
+        if (getPiece(indexx, indexy + 1) == opposing)
+        {
+            Vector<GoPiece> chain = new Vector<GoPiece>();
+            chainMaking(indexx, indexy + 1, chain);
+            chainCheck(chain);
+        }
+    }
+
+    private void chainCheck(Vector<GoPiece> chain)
+    {
+        boolean safe = false;
+        for (int i = 0; i < chain.size(); i++)
+        {
+            if (checkPieceIntersec(chain.elementAt(i).indexx, chain.elementAt(i).indexy) == 1)
+            {
+                safe = true;
+            }
+        }
+        if (!safe)
+        {
+            for (int i = 0; i < chain.size(); i++)
+            {
+                chain.elementAt(i).resetPiece();
+            }
+            chain.removeAllElements();
+        }
+    }
+
+    private void chainMaking(int indexx, int indexy, Vector<GoPiece> chain)
+    {
+        chain.add(render[indexx][indexy]);
+        if (getPiece(indexx + 1, indexy) == opposing && existingInChain(chain, indexx + 1, indexy) == 0)
+        {
+            chainMaking(indexx + 1, indexy, chain);
+        }
+        if (getPiece(indexx - 1, indexy) == opposing && existingInChain(chain, indexx - 1, indexy) == 0)
+        {
+            chainMaking(indexx - 1, indexy, chain);
+        }
+        if (getPiece(indexx, indexy - 1) == opposing && existingInChain(chain, indexx, indexy - 1) == 0)
+        {
+            chainMaking(indexx, indexy - 1, chain);
+        }
+        if (getPiece(indexx, indexy + 1) == opposing && existingInChain(chain, indexx, indexy + 1) == 0)
+        {
+            chainMaking(indexx, indexy + 1, chain);
+        }
+    }
+
+    private int existingInChain(Vector<GoPiece> chain, int indexx, int indexy)
+    {
+        for (int i = 0; i < chain.size(); i++)
+        {
+            if (chain.elementAt(i).indexx == indexx && chain.elementAt(i).indexy == indexy)
+            {
+                return 1;
+            }
+        }
+        return 0;
+    }
+
+    public int checkPieceIntersec(int indexx, int indexy)
+    {
+        if (getPiece(indexx + 1, indexy) == 0)
+        {
+            return 1;
+        }
+        else if (getPiece(indexx - 1, indexy) == 0)
+        {
+            return 1;
+        }
+        else if (getPiece(indexx, indexy - 1) == 0)
+        {
+            return 1;
+        }
+        else if (getPiece(indexx, indexy + 1) == 0)
+        {
+            return 1;
+        }
+        return 0;
     }
 
     // overridden version of the resize method to give the board the correct size
@@ -171,7 +276,7 @@ class GoBoard extends Pane {
         {
             for (int j = 0; j < 7; j++)
             {
-                render[i][j] = new GoPiece(0);
+                render[i][j] = new GoPiece(0, i, j);
                 getChildren().add(render[i][j]);
             }
         }
