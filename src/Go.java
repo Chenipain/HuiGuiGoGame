@@ -1,20 +1,6 @@
 import javafx.application.Application;
-import javafx.event.EventHandler;
-import javafx.scene.Group;
 import javafx.scene.Scene;
-import javafx.scene.control.Control;
-import javafx.scene.control.SkinBase;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Ellipse;
-import javafx.scene.shape.Line;
-import javafx.scene.shape.Rectangle;
-import javafx.scene.transform.Translate;
 import javafx.stage.Stage;
 
 //class defnition for go game
@@ -22,7 +8,7 @@ public class Go extends Application {
     // overridden init method
     public void init() {
         sp_mainlayout = new StackPane();
-        rc_go = new GoControl();
+        rc_go = new CustomControl();
         sp_mainlayout.getChildren().add(rc_go);
     }
 
@@ -45,7 +31,7 @@ public class Go extends Application {
 
     // private fields for a stack pane and a reversi control
     private StackPane sp_mainlayout;
-    private GoControl rc_go;
+    private CustomControl rc_go;
 
 }
 

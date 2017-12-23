@@ -1,9 +1,8 @@
-import java.lang.reflect.Array;
 import java.util.Arrays;
 
 public class GoBoardStorage {
 
-    public GoBoardStorage(GoPiece[][] initialBoard)
+    public GoBoardStorage(Stone[][] initialBoard)
     {
         board = new char[7][7];
         for (int i = 0; i < 7; i++)
@@ -19,7 +18,7 @@ public class GoBoardStorage {
         }
     }
 
-    public boolean isSame(GoPiece[][] initialBoard)
+    public boolean isSame(Stone[][] initialBoard)
     {
         char[][] new_board = new char[7][7];
         int initialBoardSize = 0;

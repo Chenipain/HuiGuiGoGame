@@ -1,8 +1,8 @@
 import javafx.scene.control.SkinBase;
 
-class GoControlSkin extends SkinBase<GoControl> {
+class CustomControlSkin extends SkinBase<CustomControl> {
     // default constructor for the class
-    public GoControlSkin(GoControl rc) {
+    public CustomControlSkin(CustomControl rc) {
         super(rc);
     }
 }

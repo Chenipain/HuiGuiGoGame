@@ -4,12 +4,11 @@ import javafx.scene.control.Control;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.control.Button;
 
-class GoControl extends Control {
+class CustomControl extends Control {
     // constructor for the class
-    public GoControl() {
-        setSkin(new GoControlSkin(this));
+    public CustomControl() {
+        setSkin(new CustomControlSkin(this));
         rb_board = new GoBoard();
         this.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override

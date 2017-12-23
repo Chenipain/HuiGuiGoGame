@@ -3,11 +3,9 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Ellipse;
 import javafx.scene.transform.Translate;
 
-import java.util.Vector;
-
-class GoPiece extends Group {
+class Stone extends Group {
     // default constructor for the class
-    public GoPiece(int player, int x, int y) {
+    public Stone(int player, int x, int y) {
         this.player = player;
         piece = new Ellipse();
         t = new Translate();

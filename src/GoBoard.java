@@ -3,17 +3,8 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Line;
-import javafx.scene.shape.Rectangle;
-import javafx.scene.text.TextAlignment;
-import javafx.scene.transform.Translate;
-
 import javafx.scene.text.Text;
 import javafx.scene.text.Font;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
-
-import java.lang.reflect.Array;
 import java.util.Vector;
 
 class GoBoard extends Pane {
@@ -27,7 +18,7 @@ class GoBoard extends Pane {
         boardView = new ImageView();
         boardView.setImage(board);
         this.getChildren().add(boardView);
-        render = new GoPiece[7][7];
+        render = new Stone[7][7];
         display = new Text();
         previous_states = new Vector<GoBoardStorage>();
         initialiseRender();
@@ -66,7 +57,7 @@ class GoBoard extends Pane {
         pass = false;
     }
 
-
+    //Check if a move is possible
     public boolean validateMove(int indexx, int indexy)
     {
         if (!checkSuicide(indexx, indexy))
@@ -83,6 +74,7 @@ class GoBoard extends Pane {
         return true;
     }
 
+    //Check the Ko rule
     public boolean checkKo()
     {
         for (int i = 0; i < previous_states.size(); i++)
@@ -103,43 +95,46 @@ class GoBoard extends Pane {
         return true;
     }
 
+    //check the Suicide rule
     private boolean checkSuicide(int indexx, int indexy)
     {
         checkChains(indexx, indexy);
-        Vector<GoPiece> chain = new Vector<>();
+        Vector<Stone> chain = new Vector<>();
         chainMaking(indexx, indexy, chain, current_player);
         return chainCheck(chain,false);
     }
 
+    //check if chains have free intersection and destroy them if necessary
     public void checkChains(int indexx, int indexy)
     {
         if (getPiece(indexx + 1, indexy) == opposing)
         {
-            Vector<GoPiece> chain = new Vector<GoPiece>();
+            Vector<Stone> chain = new Vector<Stone>();
             chainMaking(indexx + 1, indexy, chain, opposing);
             chainCheck(chain,true);
         }
         if (getPiece(indexx - 1, indexy) == opposing)
         {
-            Vector<GoPiece> chain = new Vector<GoPiece>();
+            Vector<Stone> chain = new Vector<Stone>();
             chainMaking(indexx - 1, indexy, chain, opposing);
             chainCheck(chain,true);
         }
         if (getPiece(indexx, indexy - 1) == opposing)
         {
-            Vector<GoPiece> chain = new Vector<GoPiece>();
+            Vector<Stone> chain = new Vector<Stone>();
             chainMaking(indexx, indexy - 1, chain, opposing);
             chainCheck(chain, true);
         }
         if (getPiece(indexx, indexy + 1) == opposing)
         {
-            Vector<GoPiece> chain = new Vector<GoPiece>();
+            Vector<Stone> chain = new Vector<Stone>();
             chainMaking(indexx, indexy + 1, chain, opposing);
             chainCheck(chain, true);
         }
     }
 
-    private boolean chainCheck(Vector<GoPiece> chain, boolean destroy)
+    //check intersection for a specific chain and destroy it if necessary
+    private boolean chainCheck(Vector<Stone> chain, boolean destroy)
     {
         boolean safe = false;
         for (int i = 0; i < chain.size(); i++)
@@ -171,7 +166,8 @@ class GoBoard extends Pane {
         return true;
     }
 
-    private void chainMaking(int indexx, int indexy, Vector<GoPiece> chain, int player)
+    //Create chains from group of pieces
+    private void chainMaking(int indexx, int indexy, Vector<Stone> chain, int player)
     {
         chain.add(render[indexx][indexy]);
         if (getPiece(indexx + 1, indexy) == player && existingInChain(chain, indexx + 1, indexy) == 0)
@@ -192,7 +188,8 @@ class GoBoard extends Pane {
         }
     }
 
-    private int existingInChain(Vector<GoPiece> chain, int indexx, int indexy)
+    //check if a piece already exists in a chain
+    private int existingInChain(Vector<Stone> chain, int indexx, int indexy)
     {
         for (int i = 0; i < chain.size(); i++)
         {
@@ -204,7 +201,8 @@ class GoBoard extends Pane {
         return 0;
     }
 
-    public int checkPieceIntersec(int indexx, int indexy)
+    //Check if at least one intersection is free for a piece
+    private int checkPieceIntersec(int indexx, int indexy)
     {
         if (getPiece(indexx + 1, indexy) == 0)
         {
@@ -273,13 +271,14 @@ class GoBoard extends Pane {
         player2_score = capturedBlack;
         countTer();
         resetCounting();
-        String text = new String("\t\tP1 : Captured(" + capturedWhite + ") / Owned(" + (player1_score - capturedWhite) + ")\t|\tCurrently Playing : Player " + opposing + "\t|\tP2 : Captured(" + capturedBlack + ") / Owner(" + (player2_score - capturedBlack) + ")");
+        String text = new String("\t\tP1 : Captured(" + capturedWhite + ") / Owned(" + (player1_score - capturedWhite) + ")\t|\tCurrently Playing : Player " + opposing + "\t|\tP2 : Captured(" + capturedBlack + ") / Owned(" + (player2_score - capturedBlack) + ")");
         display.setText(text);
         display.setFont(new Font(15));
         display.relocate(10, 35);
         display.setFill(Color.GRAY);
     }
 
+    //Count territories from each player
     private void countTer()
     {
         for (int i = 0; i < 7; i++)
@@ -289,10 +288,11 @@ class GoBoard extends Pane {
                 if (getPiece(i, j) == 0) {
                     hasBlack = false;
                     hasWhite = false;
-                    Vector<GoPiece> chain = new Vector<>();
+                    Vector<Stone> chain = new Vector<>();
                     chainMaking(i, j, chain, 0);
                     for (int k = 0; k < chain.size(); k++) {
                         checkSurrounding(chain.elementAt(k).indexx, chain.elementAt(k).indexy);
+                        // Avoiding recounting previous 0 piece
                         chain.elementAt(k).setPiece(3);
                     }
                     if (hasBlack && !hasWhite)
@@ -308,6 +308,7 @@ class GoBoard extends Pane {
         }
     }
 
+    //replace the 3 by 0 in the board
     private void resetCounting()
     {
         for (int i = 0; i < 7; i++)
@@ -322,6 +323,7 @@ class GoBoard extends Pane {
         }
     }
 
+    //check all intersections around the piece
     private void checkSurrounding(int x, int y)
     {
         checkThePiece(x + 1, y);
@@ -330,6 +332,7 @@ class GoBoard extends Pane {
         checkThePiece(x, y + 1);
     }
 
+    //check the presence of white or black in surrounding
     private void checkThePiece(int x, int y)
     {
         if (getPiece(x, y) == 1)
@@ -394,13 +397,13 @@ class GoBoard extends Pane {
         {
             for (int j = 0; j < 7; j++)
             {
-                render[i][j] = new GoPiece(0, i, j);
+                render[i][j] = new Stone(0, i, j);
                 getChildren().add(render[i][j]);
             }
         }
     }
 
-    private GoPiece[][] render;
+    private Stone[][] render;
     // the current player who is playing and who is his opposition
     private int current_player;
     private int opposing;
@@ -419,9 +422,12 @@ class GoBoard extends Pane {
     private Text winnerLabel;
     // Image of the goban
     private ImageView boardView;
+    //Storage for previous game stages
     private Vector<GoBoardStorage> previous_states;
+    //boolean used to check free territories
     private boolean hasBlack;
     private boolean hasWhite;
+    //total of captured stones
     private int capturedBlack;
     private int capturedWhite;
     // boolean to determine if the last turn has been passed
