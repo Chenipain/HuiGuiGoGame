@@ -41,6 +41,7 @@ public class GoBoardStorage {
         return (Arrays.deepEquals(new_board, board));
     }
 
+
     public char[][] board;
     private int size;
 }

@@ -147,6 +147,14 @@ class GoBoard extends Pane {
                 for (int i = 0; i < chain.size(); i++) {
                     chain.elementAt(i).resetPiece();
                 }
+                if (current_player == 1)
+                {
+                    player1_score += chain.size();
+                }
+                else
+                {
+                    player2_score += chain.size();
+                }
                 chain.removeAllElements();
             }
             return false;
@@ -249,18 +257,9 @@ class GoBoard extends Pane {
 
     // private method for updating the player scores
     private void updateScores() {
-        player2_score = 0;
-        player1_score = 0;
-        for (int i = 0; i < 7; i++)
-        {
-            for (int j = 0; j < 7; j++)
-            {
-                if (getPiece(i, j) == 1)
-                    player1_score++;
-                if (getPiece(i, j) == 2)
-                    player2_score++;
-            }
-        }
+        hasBlack = false;
+        hasWhite = false;
+        
         Text display = new Text("\tPlayer 1 : " + player1_score + "\t|\tCurrently Playing : Player " + current_player + "\t|\tPlayer 2 : " + player2_score);
         display.setFont(new Font(20));
         display.setY(50);
@@ -354,4 +353,6 @@ class GoBoard extends Pane {
     private Text winnerLabel;
     private ImageView boardView;
     private Vector<GoBoardStorage> previous_states;
+    private boolean hasBlack;
+    private boolean hasWhite;
 }
