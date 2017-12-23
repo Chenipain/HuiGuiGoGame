@@ -1,15 +1,24 @@
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.text.TextAlignment;
 import javafx.scene.transform.Translate;
 
 import javafx.scene.text.Text;
 import javafx.scene.text.Font;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 
 class GoBoard extends Pane {
     // default constructor for the class
     public GoBoard() {
+        Image board = new Image("/resources/board.png");
+        boardView = new ImageView();
+        boardView.setImage(board);
+        this.getChildren().add(boardView);
         render = new GoPiece[7][7];
         initialiseRender();
         resetGame();
@@ -53,6 +62,8 @@ class GoBoard extends Pane {
     // overridden version of the resize method to give the board the correct size
     @Override
     public void resize(double width, double height) {
+        boardView.setFitWidth(width);
+        boardView.setFitHeight(height);
         super.resize(width, height);
         cell_height = height / 7.0;
         cell_width = width / 7.0;
@@ -68,9 +79,8 @@ class GoBoard extends Pane {
         render[1][0].setPiece(1);
         render[0][1].setPiece(1);
         in_play = true;
-        current_player = 1;
-        opposing = 2;
-        swapPlayers();
+        current_player = 2;
+        opposing = 1;
         updateScores();
     }
 
@@ -91,11 +101,6 @@ class GoBoard extends Pane {
         save = current_player;
         current_player = opposing;
         opposing = save;
-        Text turn = new Text("Currently Playing : Player " + current_player);
-        turn.setFont(new Font(20));
-        turn.setY(35);
-        turn.setX(520);
-        this.getChildren().add(turn);
     }
 
     // private method for updating the player scores
@@ -112,14 +117,10 @@ class GoBoard extends Pane {
                     player2_score++;
             }
         }
-        Text score1 = new Text("Player 1 : " + player1_score);
-        score1.setFont(new Font(20));
-        score1.setY(35);
-        this.getChildren().add(score1);
-        Text score2 = new Text("Player 2 : " + player2_score);
-        score2.setFont(new Font(20));
-        score2.setY(745);
-        this.getChildren().add(score2);
+        Text display = new Text("\tPlayer 1 : " + player1_score + "\t|\tCurrently Playing : Player " + current_player + "\t|\tPlayer 2 : " + player2_score);
+        display.setFont(new Font(20));
+        display.setY(50);
+        this.getChildren().add(display);
     }
 
     // private method for resizing and relocating all the pieces
@@ -332,4 +333,5 @@ class GoBoard extends Pane {
     // 3x3 array that determines if a reverse can be made in any direction
     private boolean[][] can_reverse;
     private Text winnerLabel;
+    private ImageView boardView;
 }

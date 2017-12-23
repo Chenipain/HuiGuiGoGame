@@ -16,9 +16,6 @@ import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.transform.Translate;
 import javafx.stage.Stage;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
-
 
 //class defnition for go game
 public class Go extends Application {
@@ -26,13 +23,6 @@ public class Go extends Application {
     public void init() {
         sp_mainlayout = new StackPane();
         rc_go = new GoControl();
-        Image board = new Image("/resources/board.png");
-        ImageView boardView = new ImageView();
-        boardView.setImage(board);
-        boardView.setFitHeight(800);
-        boardView.setFitWidth(800);
-        boardView.setPreserveRatio(true);
-        sp_mainlayout.getChildren().add(boardView);
         sp_mainlayout.getChildren().add(rc_go);
     }
 
