@@ -1,3 +1,4 @@
+import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
@@ -19,13 +20,21 @@ class GoBoard extends Pane {
     // default constructor for the class
     public GoBoard() {
         Image board = new Image("/resources/board.png");
+        passButton = new Button("Pass");
+        passButton.setLayoutX(this.getWidth());
+        passButton.setLayoutY(this.getHeight());
+        winnerLabel = new Text();
         boardView = new ImageView();
         boardView.setImage(board);
         this.getChildren().add(boardView);
         render = new GoPiece[7][7];
+        display = new Text();
+        previous_states = new Vector<GoBoardStorage>();
         initialiseRender();
         resetGame();
-        previous_states = new Vector<GoBoardStorage>();
+        this.getChildren().add(display);
+        this.getChildren().add(winnerLabel);
+        this.getChildren().add(passButton);
     }
 
     // public method that will try to place a piece in the given x,y coordinate
@@ -44,7 +53,6 @@ class GoBoard extends Pane {
         checkChains(indexx, indexy);
         updateScores();
         if (current_player == 1) {
-
             System.out.println("Player 1 : " + player1_score);
             System.out.println("Player 2 : " + player2_score);
             System.out.println("Player 2 turn");
@@ -55,7 +63,7 @@ class GoBoard extends Pane {
             System.out.println("Ready Player One");
         }
         swapPlayers();
-        determineEndGame();
+        pass = false;
     }
 
 
@@ -230,13 +238,14 @@ class GoBoard extends Pane {
 
     // public method for resetting the game
     public void resetGame() {
+        previous_states.clear();
         resetRenders();
         capturedWhite = 0;
         capturedBlack = 0;
         in_play = true;
         current_player = 2;
         opposing = 1;
-        updateScores();
+        winnerLabel.setVisible(false);
     }
 
     // private method that will reset the renders
@@ -251,7 +260,7 @@ class GoBoard extends Pane {
     }
 
     // private method for swapping the players
-    private void swapPlayers() {
+    public void swapPlayers() {
         int save;
         save = current_player;
         current_player = opposing;
@@ -259,15 +268,16 @@ class GoBoard extends Pane {
     }
 
     // private method for updating the player scores
-    private void updateScores() {
+    public void updateScores() {
         player1_score = capturedWhite;
         player2_score = capturedBlack;
         countTer();
         resetCounting();
-        Text display = new Text("\tPlayer 1 : " + player1_score + "\t|\tCurrently Playing : Player " + current_player + "\t|\tPlayer 2 : " + player2_score);
-        display.setFont(new Font(20));
-        display.setY(50);
-        this.getChildren().add(display);
+        String text = new String("\t\tP1 : Captured(" + capturedWhite + ") / Owned(" + (player1_score - capturedWhite) + ")\t|\tCurrently Playing : Player " + opposing + "\t|\tP2 : Captured(" + capturedBlack + ") / Owner(" + (player2_score - capturedBlack) + ")");
+        display.setText(text);
+        display.setFont(new Font(15));
+        display.relocate(10, 35);
+        display.setFill(Color.GRAY);
     }
 
     private void countTer()
@@ -354,38 +364,28 @@ class GoBoard extends Pane {
         return render[x][y].getPiece();
     }
 
-    // private method that will determine if the end of the game has been reached
-    private void determineEndGame() {
-        if (false)
-        {
-            swapPlayers();
-            if (false) {
-                in_play = false;
-                determineWinner();
-            }
-        }
-    }
     // private method that determines who won the game
-    private void determineWinner() {
+    public void determineWinner() {
+        player2_score += 1.5;
         if (player1_score < player2_score)
         {
-            winnerLabel = new Text("Player 2 wins !");
+            winnerLabel.setText("Player 2 wins !");
             System.out.println("Player 2 wins !");
         }
         else if (player1_score > player2_score)
         {
-            winnerLabel = new Text("Player 1 wins !");
+            winnerLabel.setText("Player 1 wins !");
             System.out.println("Player 1 wins !");
         }
         else
         {
-            winnerLabel = new Text("WOW THAT IS A DRAW !");
+            winnerLabel.setText("WOW THAT IS A DRAW !");
             System.out.println("WOW THAT IS A DRAW !");
         }
         winnerLabel.setFont(new Font(100));
         winnerLabel.setVisible(true);
         winnerLabel.setY(200);
-        this.getChildren().add(winnerLabel);
+        winnerLabel.setFill(Color.GRAY);
     }
 
     // private method that will initialise everything in the render array
@@ -407,8 +407,8 @@ class GoBoard extends Pane {
     // is the game currently in play
     private boolean in_play;
     // current scores of player 1 and player 2
-    private int player1_score;
-    private int player2_score;
+    private double player1_score;
+    private double player2_score;
     // the width and height of a cell in the board
     private double cell_width;
     private double cell_height;
@@ -417,10 +417,15 @@ class GoBoard extends Pane {
     // 3x3 array that determines if a reverse can be made in any direction
     private boolean[][] can_reverse;
     private Text winnerLabel;
+    // Image of the goban
     private ImageView boardView;
     private Vector<GoBoardStorage> previous_states;
     private boolean hasBlack;
     private boolean hasWhite;
     private int capturedBlack;
     private int capturedWhite;
+    // boolean to determine if the last turn has been passed
+    public boolean pass;
+    public Text display;
+    public Button passButton;
 }
